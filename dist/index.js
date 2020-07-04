@@ -1,62 +1,40 @@
-import { Hash, createHash } from "crypto";
-
-enum Element {
-    sink,
-    source
-}
-
-type Node = {
-    label: string;
-    digest: Buffer;
-    type: Element;
-    offset?: number;
-    idx?: number;
-}
-
-type Edge = {
-    source: Node;
-    target: Node;
-}
-
-type Graph = {
-    nodes: Array<Node>;
-    edges: Array<Edge>;
-}
-
-export class MerkelDag {
-    md: Array<Node>
-    graph: Graph
-    depth: number
-    hashType: string
-
-    constructor(size: number, hashAlgorithm?: string) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MerkelDag = void 0;
+const crypto_1 = require("crypto");
+var Element;
+(function (Element) {
+    Element[Element["sink"] = 0] = "sink";
+    Element[Element["source"] = 1] = "source";
+})(Element || (Element = {}));
+class MerkelDag {
+    constructor(size, hashAlgorithm) {
         this.graph = {
-            nodes: new Array<Node>(),
-            edges: new Array<Edge>(),
+            nodes: new Array(),
+            edges: new Array(),
         };
-        this.md  = new Array<Node>(size).fill(null);
+        this.md = new Array(size).fill(null);
         if (hashAlgorithm) {
             this.hashType = hashAlgorithm;
-        } else {
+        }
+        else {
             this.hashType = "sha256";
         }
     }
-
-    private appendTree(next: Node, n: Node): Node {
-        const prev: Node = next;
+    appendTree(next, n) {
+        const prev = next;
         next = {
             label: n.label + "+" + prev.label,
             type: Element.sink,
             digest: this.weld(n.digest, prev.digest).digest()
         };
-        this.graph.edges.push({source: n, target: next});
-        this.graph.edges.push({source: prev, target: next});
+        this.graph.edges.push({ source: n, target: next });
+        this.graph.edges.push({ source: prev, target: next });
         return next;
     }
-
-    append(hash: Hash, label: string): [Error, number] {
+    append(hash, label) {
         this.depth++;
-        let next: Node = {
+        let next = {
             idx: 0,
             offset: this.depth,
             type: Element.source,
@@ -69,7 +47,8 @@ export class MerkelDag {
                     this.md[offset] = null;
                     this.graph.nodes.push(next);
                     next = this.appendTree(next, n);
-                } else {
+                }
+                else {
                     this.graph.nodes.push(next);
                     this.md[offset] = next;
                     next = null;
@@ -78,49 +57,48 @@ export class MerkelDag {
         });
         return [null, this.depth];
     }
-
-    hash(): Hash {
-        return createHash(this.hashType);
+    hash() {
+        return crypto_1.createHash(this.hashType);
     }
-
-    weld(lHash: Buffer, rHash: Buffer): Hash {
-        const sum = createHash(this.hashType);
+    weld(lHash, rHash) {
+        const sum = crypto_1.createHash(this.hashType);
         sum.write(lHash);
         sum.write(rHash);
         return sum;
     }
-
     // close out the state vector returning merkel root
-    truncateRoot(): Buffer {
-        let next: Node = null;
-        this.md.forEach((n: Node, offset) => {
+    truncateRoot() {
+        let next = null;
+        this.md.forEach((n, offset) => {
             if (n) {
                 if (next) {
                     this.md[offset] = null;
                     next = this.appendTree(next, n);
                     this.graph.nodes.push(next);
-                } else {
+                }
+                else {
                     next = n;
                 }
             }
         });
         return next.digest;
     }
-
-    printGraph(): string {
+    printGraph() {
         let out = "";
-        this.graph.nodes.forEach((n: Node, idx: number) => {
+        this.graph.nodes.forEach((n, idx) => {
             n.idx = idx;
             if (n.type == Element.source) {
-                out += idx+" {color: red, label: "+n.label+"}\n";
-            } else {
-                out += idx+" {color: blue, label: "+n.label+"}\n";
+                out += idx + " {color: red, label: " + n.label + "}\n";
+            }
+            else {
+                out += idx + " {color: blue, label: " + n.label + "}\n";
             }
         });
-        this.graph.edges.forEach((e: Edge) => {
-            out += e.source.idx+" -> "+e.target.idx+"\n";
+        this.graph.edges.forEach((e) => {
+            out += e.source.idx + " -> " + e.target.idx + "\n";
         });
         return out;
     }
-
 }
+exports.MerkelDag = MerkelDag;
+//# sourceMappingURL=index.js.map

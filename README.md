@@ -11,4 +11,4 @@ Can visualize the graph using Halfviz tool.
 
 Builds a graph visualization
 
-http://arborjs.org/halfviz/#/MTI5NjY
+http://arborjs.org/halfviz/#/MTI5Njc

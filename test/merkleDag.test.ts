@@ -20,7 +20,6 @@ describe("MerkelDag",() => {
         const execute = (action: string) => {
             const [err] = state.append(getHash(action), action);
             expect(err).to.be.null;
-
         };
         execute("foo");
         execute("bar");
@@ -37,6 +36,8 @@ describe("MerkelDag",() => {
         execute("plugh");
         execute("xyzzy");
         execute("thud");
+        expect(state.truncateRoot().toString("hex"))
+            .to.equal("b9d8206728272c5c6fa042dbd3d259a6d1f0761a8e031654d9da798a6276c3b1");
         console.log(state.printGraph());
     });
 });

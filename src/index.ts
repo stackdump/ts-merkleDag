@@ -84,24 +84,46 @@ export class MerkelDag {
 
     // close out the merkel state vector
     // return the root
-    truncateRoot(): Hash {
-        return null;
+    truncateRoot(): Buffer {
+        let next: Node = null;
+        let prev: Node = null;
+        this.md.forEach((n: Node, offset) => {
+            if (!n) {
+                return;
+            }
+            if (n && !next) {
+                next = n;
+                return;
+            }
+            if (next && n) {
+                prev = next;
+                next = {
+                    label: n.label+"+"+prev.label,
+                    type: Element.sink,
+                    digest: this.weld(n.digest,prev.digest).digest()
+                };
+                this.md[offset] = null;
+                this.graph.nodes.push(next);
+                this.graph.edges.push({source: n, target: next});
+                this.graph.edges.push({source: prev, target: next});
+                return;
+            }
+            throw Error("unexpected");
+        });
+        return next.digest;
     }
 
     printGraph(): string {
         let out = "";
-        const nodeIds: Map<string, number> = new Map<string,number>();
-
         this.graph.nodes.forEach((n: Node, idx: number) => {
             n.idx = idx;
-            nodeIds.set(n.digest.toString("hex"), idx);
             if (n.type == Element.source) {
                 out += idx+" {color: red, label: "+n.label+"}\n";
             } else {
                 out += idx+" {color: blue, label: "+n.label+"}\n";
             }
         });
-        this.graph.edges.forEach((e: Edge, idx: number) => {
+        this.graph.edges.forEach((e: Edge) => {
             out += e.source.idx+" -> "+e.target.idx+"\n";
         });
         return out;

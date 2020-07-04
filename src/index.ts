@@ -50,16 +50,9 @@ export class MerkelDag {
         this.md.forEach((n, offset) => {
             if (next) {
                 if (n) {
-                    const prev: Node = next;
-                    next = {
-                        label: n.label+"+"+prev.label,
-                        type: Element.sink,
-                        digest: this.weld(n.digest,prev.digest).digest()
-                    };
                     this.md[offset] = null;
-                    this.graph.nodes.push(prev);
-                    this.graph.edges.push({source: n, target: next});
-                    this.graph.edges.push({source: prev, target: next});
+                    this.graph.nodes.push(next);
+                    next = this.appendTree(next, n);
                 } else {
                     this.graph.nodes.push(next);
                     this.md[offset] = next;
@@ -86,31 +79,31 @@ export class MerkelDag {
     // return the root
     truncateRoot(): Buffer {
         let next: Node = null;
-        let prev: Node = null;
         this.md.forEach((n: Node, offset) => {
             if (!n) {
                 return;
             }
             if (n && !next) {
                 next = n;
-                return;
-            }
-            if (next && n) {
-                prev = next;
-                next = {
-                    label: n.label+"+"+prev.label,
-                    type: Element.sink,
-                    digest: this.weld(n.digest,prev.digest).digest()
-                };
+            } else {
                 this.md[offset] = null;
+                next = this.appendTree(next, n);
                 this.graph.nodes.push(next);
-                this.graph.edges.push({source: n, target: next});
-                this.graph.edges.push({source: prev, target: next});
-                return;
             }
-            throw Error("unexpected");
         });
         return next.digest;
+    }
+
+    private appendTree(next: Node, n: Node): Node {
+        const prev: Node = next;
+        next = {
+            label: n.label + "+" + prev.label,
+            type: Element.sink,
+            digest: this.weld(n.digest, prev.digest).digest()
+        };
+        this.graph.edges.push({source: n, target: next});
+        this.graph.edges.push({source: prev, target: next});
+        return next;
     }
 
     printGraph(): string {

@@ -1,12 +1,12 @@
 {
-    "name": "ts-merkelDag",
+    "name": "ts-merkleDag",
     "version": "0.1.0",
     "main": "./dist/index.js",
     "types": "./dist/index.ts",
     "description": "",
     "repository": {
         "type": "git",
-        "url": "https://github.com/stackdump/ts-merkelDag"
+        "url": "https://github.com/stackdump/ts-merkleDag"
     },
     "author": "stackdump",
     "license": "MIT",

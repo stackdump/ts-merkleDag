@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MerkelDag = void 0;
+exports.MerkleDag = void 0;
 const crypto_1 = require("crypto");
 var Element;
 (function (Element) {
     Element[Element["sink"] = 0] = "sink";
     Element[Element["source"] = 1] = "source";
 })(Element || (Element = {}));
-class MerkelDag {
+class MerkleDag {
     constructor(size, hashAlgorithm) {
         this.graph = {
             nodes: new Array(),
@@ -66,7 +66,7 @@ class MerkelDag {
         sum.write(rHash);
         return sum;
     }
-    // close out the state vector returning merkel root
+    // close out the state vector returning merkle root
     truncateRoot() {
         let next = null;
         this.md.forEach((n, offset) => {
@@ -100,5 +100,5 @@ class MerkelDag {
         return out;
     }
 }
-exports.MerkelDag = MerkelDag;
+exports.MerkleDag = MerkleDag;
 //# sourceMappingURL=index.js.map

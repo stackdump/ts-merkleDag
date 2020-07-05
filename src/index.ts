@@ -23,7 +23,7 @@ type Graph = {
     edges: Array<Edge>;
 }
 
-export class MerkelDag {
+export class MerkleDag {
     md: Array<Node>
     graph: Graph
     depth: number
@@ -90,7 +90,7 @@ export class MerkelDag {
         return sum;
     }
 
-    // close out the state vector returning merkel root
+    // close out the state vector returning merkle root
     truncateRoot(): Buffer {
         let next: Node = null;
         this.md.forEach((n: Node, offset) => {

@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { MerkelDag } from "../src";
+import { MerkleDag } from "../src";
 
-const state = new MerkelDag(10);
+const state = new MerkleDag(10);
 
 const getHash = (data: string) => {
     const h1 = state.hash();
@@ -9,7 +9,7 @@ const getHash = (data: string) => {
     return h1;
 };
 
-describe("MerkelDag",() => {
+describe("MerkleDag",() => {
     it("should use sha256 ", () => {
         expect(getHash("foo").digest().toString("hex"))
             .to.equal("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
